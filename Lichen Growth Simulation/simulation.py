@@ -27,7 +27,6 @@ class Simulation:
         pygame.display.set_caption("Lichen Growth")
         self.displaySurface = pygame.display.set_mode(self.size)
         self.pixelArray = pygame.PixelArray(self.displaySurface)
-        self.pixelColour = (255, 0, 0)
         self.isRunning = True
 
         # Set a seed point
