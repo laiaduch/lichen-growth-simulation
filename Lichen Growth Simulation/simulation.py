@@ -9,7 +9,7 @@ class Simulation:
 
         self.minX, self.minY = self.X, self.Y
         self.maxX, self.maxY = self.X, self.Y
-        self.padSize = 50
+        self.padSize = 10
 
         self.domainMinX = self.startX - self.padSize
         self.domainMaxX = self.startX + self.padSize
