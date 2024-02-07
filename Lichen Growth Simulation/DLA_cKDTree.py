@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from scipy.spatial import cKDTree
 
 # Constants
 width = 800
@@ -9,10 +10,10 @@ background_color = (27, 30, 32)
 particle_color = (255, 255, 255)
 particle_radius = 1
 epsilon = particle_radius / 2
-walk_distance = 3 # Adjust as needed
-alpha = 1  # Adjust as needed
-sigma = 3  # Adjust as needed
-tau = 0.6  # Adjust as needed
+walk_distance = 5
+alpha = 0.1  # Adjust as needed
+sigma = 0.01  # Adjust as needed
+tau = 3  # Adjust as needed
 desired_particles = 1000
 
 
@@ -38,6 +39,8 @@ def main():
 
     # Initialize with a seed particle
     particles = [Particle((width / 2, height / 2), pygame.Vector2(0, -1))]  # Starting with an upward direction
+    particle_positions = [p.position for p in particles]
+    kdtree = cKDTree(particle_positions)
     particle_count = 1
 
     while particle_count < desired_particles:
@@ -57,15 +60,20 @@ def main():
             current_particle.position[1] + new_direction.y * walk_distance
         )
 
+        # Use cKDTree to find neighboring particles
+        neighboring_indices = kdtree.query_ball_point(current_particle.position, 2 * particle_radius + epsilon)
+        neighboring_particles = [particles[i] for i in neighboring_indices]
+
         # Add new particle to the cluster
-        if random.random() < compute_aggregation_probability(current_particle, particles):
+        if random.random() < compute_aggregation_probability(current_particle, neighboring_particles):
             # Create a new particle at the current position with a random direction
             new_particle = Particle(current_particle.position, pygame.Vector2(0, -1))
 
             # Check for aggregation with existing particles
             if any(pygame.Vector2(new_particle.position).distance_to(p.position) < particle_radius * 2 + epsilon for p
-                   in particles):
+                   in neighboring_particles):
                 particles.append(new_particle)
+                kdtree = cKDTree(particle_positions)  # Update cKDTree with the new particle position
                 particle_count += 1
 
         # Draw particles
@@ -84,7 +92,6 @@ def main():
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
                 pygame.quit()
                 waiting = False
-
 
 if __name__ == "__main__":
     main()
