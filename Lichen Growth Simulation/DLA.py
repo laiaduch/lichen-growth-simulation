@@ -15,7 +15,7 @@ alpha = 1  # Adjust as needed
 sigma = 3  # Adjust as needed
 tau = 0.6  # Adjust as needed
 desired_particles = 1000
-
+d = 1
 
 class Particle:
     def __init__(self, position, direction):
@@ -57,11 +57,11 @@ def main():
 
         if random.random() < compute_aggregation_probability(current_particle, particles):
             new_particle = Particle(current_particle.position, pygame.Vector2(0, -1))
+            particles.append(new_particle)
+            particle_count += 1
 
-            if any(pygame.Vector2(new_particle.position).distance_to(p.position) < particle_radius * 2 + epsilon for p
-                   in particles):
-                particles.append(new_particle)
-                particle_count += 1
+            current_particle.attached = True
+
 
         screen.fill(background_color)
         for particle in particles:
@@ -75,10 +75,6 @@ def main():
         pygame.display.flip()
         pygame.time.delay(10)
 
-        # Check for attachment and update color
-        for particle in particles[:-1]:
-            if pygame.Vector2(current_particle.position).distance_to(particle.position) < particle_radius * 2 + epsilon:
-                current_particle.attached = True
 
     waiting = True
     while waiting:
