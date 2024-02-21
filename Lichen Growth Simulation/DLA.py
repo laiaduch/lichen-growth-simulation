@@ -15,7 +15,6 @@ alpha = 1  # Adjust as needed
 sigma = 3  # Adjust as needed
 tau = 0.6  # Adjust as needed
 desired_particles = 1000
-d = 1
 
 class Particle:
     def __init__(self, position, direction):

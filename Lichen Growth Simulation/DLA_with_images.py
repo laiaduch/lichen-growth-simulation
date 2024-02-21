@@ -5,9 +5,8 @@ import math
 # Constants
 width = 800
 height = 600
-background_color = (27, 30, 32)
 moving_color = (255, 0, 0)  # New color for moving particle
-attached_color = (13, 128, 128)   # Color for attached particles
+attached_color = (13, 128, 128)  # Color for attached particles
 
 # Parameters
 particle_radius = 2
@@ -19,6 +18,7 @@ tau = 0.6  # Adjust as needed
 desired_particles = 1000
 
 
+
 class Particle:
     def __init__(self, position, direction):
         self.position = position
@@ -26,13 +26,19 @@ class Particle:
         self.attached = False  # Added a flag to track attachment
 
 
-def compute_aggregation_probability(current_particle, neighboring_particles):
+def compute_aggregation_probability(current_particle, neighboring_particles, image):
     close_particles = [p for p in neighboring_particles if pygame.Vector2(current_particle.position).distance_to(
         p.position) < 2 * particle_radius + epsilon]
 
     n = len(close_particles)
-    return alpha + (1 - alpha) * math.exp(-(sigma * (n - tau)) ** 2)
+    aggregation_probability = alpha + (1 - alpha) * math.exp(-(sigma * (n - tau)) ** 2)
 
+    # Get grayscale value from the entire image
+    pixel_value = image.get_at((int(current_particle.position[0]), int(current_particle.position[1])))
+    pixel_value = pixel_value.r / 255.0  # Normalize to a range between 0 and 1
+
+    # Multiply by the grayscale probability
+    return aggregation_probability * pixel_value
 
 
 def main():
@@ -40,7 +46,11 @@ def main():
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Open DLA Lichen Simulation")
 
-    particles = [Particle((width // 2, height // 2), pygame.Vector2(0, -1))]
+    # Load background image and scale it to fit the screen
+    background_image = pygame.image.load('./images/L.png')
+    background_image = pygame.transform.scale(background_image, (width, height))
+
+    particles = [Particle((width / 2, height / 2), pygame.Vector2(0, -1))]
     particle_count = 1
 
     while particle_count < desired_particles:
@@ -66,15 +76,17 @@ def main():
                 random_attached_particle.position[1] + new_direction.y * walk_distance
             )
 
-        if random.random() < compute_aggregation_probability(current_particle, particles):
+        # Compute aggregation probability considering the grayscale value of the entire image
+        if random.random() < compute_aggregation_probability(current_particle, particles, background_image):
             new_particle = Particle(current_particle.position, pygame.Vector2(0, -1))
             particles.append(new_particle)
             particle_count += 1
 
             current_particle.attached = True
 
+        # Draw the background image
+        screen.blit(background_image, (0, 0))
 
-        screen.fill(background_color)
         for particle in particles:
             if particle.attached:
                 pygame.draw.circle(screen, attached_color, (int(particle.position[0]), int(particle.position[1])),
@@ -85,7 +97,6 @@ def main():
 
         pygame.display.flip()
         pygame.time.delay(10)
-
 
     waiting = True
     while waiting:
