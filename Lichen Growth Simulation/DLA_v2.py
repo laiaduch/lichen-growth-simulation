@@ -12,7 +12,7 @@ attached_color = (13, 128, 128)   # Color for attached particles
 # Parameters
 particle_radius = 2
 epsilon = particle_radius / 2
-walk_distance = 8  # Adjust as needed
+walk_distance = 6  # Adjust as needed
 alpha = 1  # Adjust as needed
 sigma = 3  # Adjust as needed
 tau = 0.6  # Adjust as needed

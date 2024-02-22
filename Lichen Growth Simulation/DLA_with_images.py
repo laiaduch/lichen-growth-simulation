@@ -18,7 +18,6 @@ tau = 0.6  # Adjust as needed
 desired_particles = 1000
 
 
-
 class Particle:
     def __init__(self, position, direction):
         self.position = position
@@ -41,6 +40,24 @@ def compute_aggregation_probability(current_particle, neighboring_particles, ima
     return aggregation_probability * pixel_value
 
 
+def find_seed_position(image):
+    max_probability = 0
+    seed_position = None
+
+    for _ in range(1000):  # Try 1000 random positions
+        x = random.randint(0, width - 1)
+        y = random.randint(0, height - 1)
+
+        current_particle = Particle((x, y), pygame.Vector2(0, -1))
+        current_probability = compute_aggregation_probability(current_particle, [], image)
+
+        if current_probability > max_probability:
+            max_probability = current_probability
+            seed_position = (x, y)
+
+    return seed_position
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((width, height))
@@ -50,7 +67,10 @@ def main():
     background_image = pygame.image.load('./images/L.png')
     background_image = pygame.transform.scale(background_image, (width, height))
 
-    particles = [Particle((width / 2, height / 2), pygame.Vector2(0, -1))]
+    # Find the seed position with the highest probability
+    seed_position = find_seed_position(background_image)
+
+    particles = [Particle(seed_position, pygame.Vector2(0, -1))]
     particle_count = 1
 
     while particle_count < desired_particles:
