@@ -101,7 +101,8 @@ def main():
             particles.pop(-1)  # Remove the particle from the list
             break  # Skip this iteration and get a new random direction
 
-        current_particle.position = new_position
+        #current_particle.position = new_position
+        current_particle.position = (new_position[0] + init_distance, new_position[1] + init_distance)
 
 
         if random.random() < compute_aggregation_probability(current_particle, particles, background_image):

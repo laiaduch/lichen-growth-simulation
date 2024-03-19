@@ -46,7 +46,7 @@ def main():
     pygame.display.set_caption("Open DLA Lichen Simulation")
 
     particles = [Particle((width // 2, height // 2), pygame.Vector2(0, -1))]
-    particle_count = 1
+    particle_count = 0
 
     while particle_count < desired_particles:
         for event in pygame.event.get():
@@ -68,10 +68,11 @@ def main():
         distance_to_attached = pygame.Vector2(new_position).distance_to(random_attached_particle.position)
         if distance_to_attached > kill_distance:
             particles.pop(-1)  # Remove the particle from the list
+            #particle_count += 1 #Preguntar!
             continue  # Skip this iteration and get a new random direction
 
-        current_particle.position = new_position
-
+        current_particle.position = (new_position[0], new_position[1])
+        
         if random.random() < compute_aggregation_probability(current_particle, particles):
             new_particle = Particle(current_particle.position, pygame.Vector2(0, -1))
             particles.append(new_particle)
