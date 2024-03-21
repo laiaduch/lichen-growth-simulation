@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 
+
 # Constants
 width = 800
 height = 600
@@ -21,26 +22,24 @@ tau = 3  # Adjust as needed
 init_distance = 2 * particle_radius + epsilon
 walk_distance = particle_radius
 ro = 2.5 * particle_radius
-#ro = 2.5
 kill_distance = 10 * ro
 
 class Particle:
     def __init__(self, position, direction):
         self.position = position
         self.direction = direction
-        self.attached = False  # Added a flag to track attachment
+
 
 def init_particle(particles):
     chosen_particle = random.choice(particles)
     angle = random.uniform(0, 2*math.pi)
     new_position = (chosen_particle.position[0] + init_distance * math.cos(angle),
                     chosen_particle.position[1] + init_distance * math.sin(angle))
-    angle = random.uniform(0, 2 * math.pi)
-    return Particle(new_position, pygame.Vector2(math.cos(angle), math.sin(angle)))
+    new_angle = random.uniform(0, 2 * math.pi)
+    return Particle(new_position, pygame.Vector2(math.cos(new_angle), math.sin(new_angle)))
 
 def compute_aggregation_probability(n):
     return alpha + (1 - alpha) * math.exp(-sigma * ((n - tau) ** 2))
-    #return 0
 
 def main():
     pygame.init()
@@ -49,13 +48,11 @@ def main():
 
     particles = [Particle((width // 2, height // 2), pygame.Vector2(0, -1))]
     current_particle = init_particle(particles)
-    particle_count = 0
 
-    for i in range(0,10):
-        print(i, compute_aggregation_probability(i))
+    #for i in range(0, 10):
+     #   print(i, compute_aggregation_probability(i))
 
-
-    while particle_count < desired_particles:
+    while len(particles) < desired_particles:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -83,19 +80,27 @@ def main():
 
         current_particle.position = (new_position[0], new_position[1])
 
-        n = 0
+        # Check if the particle is in contact with any attached particle
+        in_contact = False
         for p in particles:
-            if pygame.Vector2(current_particle.position).distance_to(p.position) < ro:
-                n += 1
+            distance_to_attached = pygame.Vector2(new_position).distance_to(p.position)
+            if distance_to_attached <= particle_radius:
+                in_contact = True
+                break
 
-        aggregation_probability = compute_aggregation_probability(n)
-        if random.random() < aggregation_probability:
-            particles.append(current_particle)
-            print(n)
-            particle_count += 1
-            #current_particle.attached = True
-            current_particle = init_particle(particles)
+        if in_contact:
+            # Get the number of neighborhood particles
+            n = 0
+            for p in particles:
+                if pygame.Vector2(current_particle.position).distance_to(p.position) < ro:
+                    n += 1
 
+            aggregation_probability = compute_aggregation_probability(n)
+            if random.random() < aggregation_probability:
+                particles.append(current_particle)
+                current_particle = init_particle(particles)
+        else:
+            current_particle.position = (new_position[0], new_position[1])
 
         screen.fill(background_color)
 
