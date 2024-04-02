@@ -1,7 +1,7 @@
 import pygame
 import random
 import math
-
+from PIL import Image
 
 # Constants
 width = 800
@@ -11,12 +11,12 @@ moving_color = (255, 0, 0)  # New color for moving particle
 attached_color = (13, 128, 128)   # Color for attached particles
 
 # Parameters
-desired_particles = 1000
+desired_particles = 500
 particle_radius = 2
 epsilon = particle_radius/2
-alpha = 10**-4 # Adjust as needed
+alpha = 10**-2 # Adjust as needed
 sigma = 0.3 # Adjust as needed
-tau = 3  # Adjust as needed
+tau = 1.5  # Adjust as needed
 
 # Distances
 init_distance = 2 * particle_radius + epsilon
@@ -29,28 +29,59 @@ class Particle:
         self.position = position
         self.direction = direction
 
-
 def init_particle(particles):
     chosen_particle = random.choice(particles)
     angle = random.uniform(0, 2*math.pi)
     new_position = (chosen_particle.position[0] + init_distance * math.cos(angle),
                     chosen_particle.position[1] + init_distance * math.sin(angle))
+
+    # Check if new position is within the screen bounds
+    new_position = (max(0, min(width - 1, new_position[0])),
+                    max(0, min(height - 1, new_position[1])))
+
     new_angle = random.uniform(0, 2 * math.pi)
     return Particle(new_position, pygame.Vector2(math.cos(new_angle), math.sin(new_angle)))
 
-def compute_aggregation_probability(n):
-    return alpha + (1 - alpha) * math.exp(-sigma * ((n - tau) ** 2))
+def compute_aggregation_probability(n, intensity):
+    # Modify the aggregation probability calculation based on pixel intensity
+    return (alpha + (1 - alpha) * math.exp(-sigma * ((n - tau) ** 2))) * intensity
+
+def load_image(path):
+    image = Image.open(path)
+    image = image.resize((width, height))  # Resize image to match canvas size
+    return pygame.image.fromstring(image.tobytes(), image.size, image.mode).convert()
+
+def find_seed_position(image):
+    max_probability = 0
+    seed_position = None
+
+    for _ in range(1000):  # Try 1000 random positions
+        x = random.randint(0, width - 1)
+        y = random.randint(0, height - 1)
+
+        #current_particle = Particle((x, y), pygame.Vector2(0, -1))
+        current_probability = compute_aggregation_probability(0, image.get_at((x, y))[0] / 255)
+
+        if current_probability > max_probability:
+            max_probability = current_probability
+            seed_position = (x, y)
+
+    return seed_position
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Open DLA Lichen Simulation")
 
-    particles = [Particle((width // 2, height // 2), pygame.Vector2(0, -1))]
-    current_particle = init_particle(particles)
+    # Load image
+    background_image = load_image('./images/L.png')
+    screen.blit(background_image, (0, 0))
 
-    #for i in range(0, 10):
-     #   print(i, compute_aggregation_probability(i))
+    # Find seed position
+    seed_position = find_seed_position(background_image)
+    particles = [Particle(seed_position, pygame.Vector2(0, -1))]
+
+    current_particle = init_particle(particles)
 
     while len(particles) < desired_particles:
         for event in pygame.event.get():
@@ -58,15 +89,11 @@ def main():
                 pygame.quit()
                 return
 
-        # Move the particle randomly
         angle = random.uniform(0, 2*math.pi)
         new_direction = pygame.Vector2(math.cos(angle), math.sin(angle))
-
-        # Calculate the new position for the current particle based on the random direction and walk distance
         new_position = (current_particle.position[0] + new_direction.x * walk_distance,
                        current_particle.position[1] + new_direction.y * walk_distance)
 
-        # Check if the particle is too far from any attached particle
         too_far = True
         for p in particles:
             distance_to_attached = pygame.Vector2(new_position).distance_to(p.position)
@@ -76,11 +103,16 @@ def main():
 
         if too_far:
             current_particle = init_particle(particles)
-            continue  # Skip this iteration and get a new random direction
+            continue
 
-        current_particle.position = (new_position[0], new_position[1])
+        # current_particle.position = (new_position[0], new_position[1])
+        # Check if new position is within the screen bounds
+        if (0 <= new_position[0] < width) and (0 <= new_position[1] < height):
+            current_particle.position = new_position
+        else:
+            current_particle = init_particle(particles)
+            continue
 
-        # Check if the particle is in contact with any attached particle
         in_contact = False
         for p in particles:
             distance_to_attached = pygame.Vector2(new_position).distance_to(p.position)
@@ -89,20 +121,22 @@ def main():
                 break
 
         if in_contact:
-            # Get the number of neighborhood particles
             n = 0
             for p in particles:
                 if pygame.Vector2(current_particle.position).distance_to(p.position) < ro:
                     n += 1
 
-            aggregation_probability = compute_aggregation_probability(n)
+            # Get pixel intensity at particle position
+            pixel_intensity = background_image.get_at((int(current_particle.position[0]), int(current_particle.position[1]))).r / 255
+
+            aggregation_probability = compute_aggregation_probability(n, pixel_intensity)
             if random.random() < aggregation_probability:
                 particles.append(current_particle)
                 current_particle = init_particle(particles)
         else:
             current_particle.position = (new_position[0], new_position[1])
 
-        screen.fill(background_color)
+        screen.blit(background_image, (0, 0))
 
         for particle in particles:
             pygame.draw.circle(screen, attached_color, (int(particle.position[0]), int(particle.position[1])),
@@ -112,7 +146,6 @@ def main():
                             particle_radius)
 
         pygame.display.flip()
-        #pygame.time.delay(10)
 
     waiting = True
     while waiting:
