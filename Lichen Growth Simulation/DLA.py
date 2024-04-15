@@ -129,6 +129,8 @@ def main():
 
         pygame.draw.circle(screen, moving_color, (int(current_particle.position[0]), int(current_particle.position[1])),
                            particle_radius)
+
+        # Draw the walk of particle before been aggregated
         #if len(positions) >= 2:
          #   pygame.draw.lines(screen, (255, 255, 255), False, positions)
 
