@@ -15,7 +15,7 @@ def build_model(input_shape):
 # Load and preprocess the input image
 def load_and_preprocess_image(image_path):
     image = cv2.imread(image_path)
-    image = cv2.resize(image, (512, 512))  # Resize
+   # image = cv2.resize(image, (512, 512 ))  # Resize
     image = image.astype(np.float32) / 255.0  # Normalize the pixels values between 0 and 1
     return image
 
@@ -30,11 +30,15 @@ def visualize_normals(normals):
     z = np.sqrt(np.maximum(0, 1 - x ** 2 - y ** 2))  # z = sqrt(max(0, 1 - x^2 - y^2))
 
     output_image = np.stack([x, y, z], axis=-1) # Map the color coordinates
+
+    # Normalize the output image to the range [0, 1]
+    output_image = (output_image + 1) / 2
+
     return (output_image + 1) * 127.5  # Scale into [0, 255]
 
 
 # image_path = './images/textures/test.png'
-input_image = load_and_preprocess_image('./images/textures/rock.jpg')
+input_image = load_and_preprocess_image('./images/textures/test.png')
 
 # Build the model
 input_shape = input_image.shape
@@ -43,7 +47,6 @@ model = build_model(input_shape)
 
 # Predict normals
 normals_map = model.predict(np.expand_dims(input_image, axis=0))[0]
-print(normals_map)
 
 output_image = visualize_normals(normals_map)
 
