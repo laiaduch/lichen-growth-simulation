@@ -34,8 +34,11 @@ def region_growing(img, seed, threshold, edge_mask=None):
 
 
 if __name__ == "__main__":
+
+    input_file = 'tree1_depth.png'
+
     # Read input image
-    input_image = cv2.imread('./images/textures/tree1_depth.png', cv2.IMREAD_GRAYSCALE)
+    input_image = cv2.imread(f'./images/input_depth/{input_file}', cv2.IMREAD_GRAYSCALE)
 
     # Apply Sobel edge detection
     sobel_x = cv2.Sobel(input_image, cv2.CV_64F, 1, 0, ksize=3)
@@ -43,7 +46,7 @@ if __name__ == "__main__":
     sobel_mag = np.sqrt(sobel_x ** 2 + sobel_y ** 2)
 
     # Threshold Sobel magnitude to obtain edge mask
-    sobel_edge_mask = np.uint8(sobel_mag > 20)  # Adjust threshold as needed
+    sobel_edge_mask = np.uint8(sobel_mag > 10)  # Adjust threshold as needed
 
     # Define seed point (you may choose this interactively)
     seed_point = (500, 250)
@@ -58,3 +61,8 @@ if __name__ == "__main__":
     cv2.imshow("Segmented Region", segmented_region)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+    # Save the output images
+    output_directory = './images/output_sobel'
+    cv2.imwrite(f'{output_directory}/{input_file}_sobel_edge_mask.png', sobel_edge_mask * 255)
+    cv2.imwrite(f'{output_directory}/{input_file}_segmented_region.png', segmented_region)
