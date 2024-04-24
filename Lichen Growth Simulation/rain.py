@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 # Load the input image of normals (assume that the image has 3 channels)
-input_file = 'rock_normal.png'
+input_file = 'tree1_normal.png'
 normal_img = cv2.imread(f'./images/input_normal/{input_file}')
 
 # Normalize the image between [-1,1]
@@ -28,7 +28,7 @@ highlight_img[rain_mask, :] = [255, 255, 255]  # Paint with white the affected r
 # Show results
 plt.subplot(1, 2, 1)
 plt.title("Normals")
-plt.imshow(cv2.cvtColor(normal_img.astype(np.float32), cv2.COLOR_BGR2RGB))
+plt.imshow(normal_img.astype(np.float32), cmap='gray')
 
 plt.subplot(1, 2, 2)
 plt.title("Areas Affected by Rain")

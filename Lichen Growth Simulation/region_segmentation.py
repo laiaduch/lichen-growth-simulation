@@ -36,7 +36,7 @@ def region_growing(img, seed, threshold, edge_mask=None):
 
 if __name__ == "__main__":
 
-    input_file = 'teulada1_depth.png'
+    input_file = 'tree1_depth.png'
 
     # Read input image
     input_image = cv2.imread(f'./images/input_depth/{input_file}', cv2.IMREAD_GRAYSCALE)
