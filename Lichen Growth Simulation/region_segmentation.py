@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def region_growing(img, seed, threshold, edge_mask=None):
@@ -35,7 +36,7 @@ def region_growing(img, seed, threshold, edge_mask=None):
 
 if __name__ == "__main__":
 
-    input_file = 'tree1_depth.png'
+    input_file = 'teulada1_depth.png'
 
     # Read input image
     input_image = cv2.imread(f'./images/input_depth/{input_file}', cv2.IMREAD_GRAYSCALE)
@@ -55,12 +56,26 @@ if __name__ == "__main__":
     threshold_value = 100  # Adjust threshold as needed
     segmented_region = region_growing(input_image, seed_point, threshold_value, sobel_edge_mask)
 
-    # Display results
+    '''# Display results
     cv2.imshow("Original Image", input_image)
     cv2.imshow("Sobel Edge Mask", sobel_edge_mask * 255)
     cv2.imshow("Segmented Region", segmented_region)
     cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows()'''
+
+    # Show results
+    plt.subplot(1, 3, 1)
+    plt.title("Original Image")
+    plt.imshow(input_image.astype(np.float32), cmap='gray')
+
+    plt.subplot(1, 3, 2)
+    plt.title("Sobel Edge Mask")
+    plt.imshow(sobel_edge_mask * 255, cmap='gray')
+
+    plt.subplot(1, 3, 3)
+    plt.title("Segmented Region")
+    plt.imshow(segmented_region, cmap='gray')
+    plt.show()
 
     # Save the output images
     output_directory = './images/output_sobel'
