@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import cv2
 
 # Load the input depth image
-input_file = 'wall3_depth.png'
+input_file = 'pedra2_depth.png'
 depth_map = cv2.imread(f'./images/input_depth/{input_file}', cv2.IMREAD_GRAYSCALE)
 img_height, img_width = depth_map.shape  # Obtain the dimensions of the image
 
@@ -30,7 +30,7 @@ def generate_samples(num_samples, radius):
 '''
 
 # Generate random samples on 2D circle
-def generate_samples(num_samples, min_radius, max_radius):
+def generate_samples(num_samples, max_radius):
     samples = []
     for _ in range(num_samples):
         angle = np.random.uniform(0, 2 * np.pi)  # Random angle
@@ -52,7 +52,7 @@ for y in range(1, img_height - 1):
         occlusion = 0
         depth = depth_map[y, x]
 
-        samples = generate_samples(num_samples, min_radius, max_radius)
+        samples = generate_samples(num_samples, max_radius)
 
         # For every sample, see if it is hidden by geometry
         for sample in samples:

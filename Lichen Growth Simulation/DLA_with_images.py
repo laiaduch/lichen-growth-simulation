@@ -78,14 +78,17 @@ def main():
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Open DLA Lichen Simulation")
 
-    # Load background image and scale it to fit the screen
-    background_image = pygame.image.load('./images/gradient.png')
-    background_image = pygame.transform.scale(background_image, (width, height))
+    # Load background image and probability map image and scale it to fit the screen
+    probability_image = pygame.image.load('./images/probability_map/probability_map.png')
+    probability_image = pygame.transform.scale(probability_image, (width, height))
+
+    background_image = pygame.image.load('./images/textures/teulada1.jpg')
+    background_image = pygame.transform.scale(background_image, (probability_image.get_width(), probability_image.get_height()))
 
     # Find the seed position with the highest probability
-    seed_position = find_seed_position(background_image)
-    # particles = [Particle(seed_position, pygame.Vector2(0, -1))]
-    particles = [Particle((2/3 * width, height // 2), pygame.Vector2(0, -1))]
+    seed_position = find_seed_position(probability_image)
+    particles = [Particle(seed_position, pygame.Vector2(0, -1))]
+    #particles = [Particle((2/3 * width, height // 2), pygame.Vector2(0, -1))]
 
 
     # Initialize the current particle
@@ -146,7 +149,7 @@ def main():
                     n += 1
 
             # Get pixel intensity at particle position
-            pixel_intensity = background_image.get_at((int(current_particle.position[0]), int(current_particle.position[1]))).r / 255
+            pixel_intensity = probability_image.get_at((int(current_particle.position[0]), int(current_particle.position[1]))).r / 255
 
             aggregation_probability = compute_aggregation_probability(n, pixel_intensity)
             if random.random() < aggregation_probability:

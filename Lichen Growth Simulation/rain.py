@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 # Load the input image of normals (assume that the image has 3 channels)
-input_file = 'teulada2_normal.png'
+input_file = 'pedra2_normal.png'
 normal_img = cv2.imread(f'./images/input_normal/{input_file}')
 
 # Normalize the image between [-1,1]
@@ -33,7 +33,7 @@ plt.imshow(normal_img.astype(np.float32), cmap='gray')
 
 plt.subplot(1, 2, 2)
 plt.title("Areas Affected by Rain")
-plt.imshow(highlight_img.astype(np.uint8))
+plt.imshow(highlight_img.astype(np.float32), cmap='gray')
 plt.show()
 
 # Save the output image
