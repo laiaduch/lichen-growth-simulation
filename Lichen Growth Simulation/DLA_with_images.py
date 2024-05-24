@@ -3,14 +3,14 @@ import random
 import math
 
 # Constants
-width = 400
-height = 300
-background_color = (27, 30, 32)
+width = 384
+height = 384
+background_color = (0, 0, 0) #(27, 30, 32)
 moving_color = (255, 0, 0)  # New color for moving particle
-attached_color = (13, 128, 128)   # Color for attached particles
+attached_color = (255, 255, 255)   # Color for attached particles   (13, 128, 128)
 
 # Parameters
-desired_particles = 10000
+desired_particles = 1000
 particle_radius = 2
 epsilon = particle_radius/2
 alpha = 10**-4  # Adjust as needed
@@ -79,11 +79,11 @@ def main():
     pygame.display.set_caption("Open DLA Lichen Simulation")
 
     # Load background image and probability map image and scale it to fit the screen
-    probability_image = pygame.image.load('./images/probability_map/probability_map.png')
+    probability_image = pygame.image.load('./images/probability_map/probability_map_teulada1_S.png')
     probability_image = pygame.transform.scale(probability_image, (width, height))
 
-    background_image = pygame.image.load('./images/textures/teulada1.jpg')
-    background_image = pygame.transform.scale(background_image, (probability_image.get_width(), probability_image.get_height()))
+    #background_image = pygame.image.load('./images/textures/teulada1.jpg')
+    #background_image = pygame.transform.scale(background_image, (probability_image.get_width(), probability_image.get_height()))
 
     # Find the seed position with the highest probability
     seed_position = find_seed_position(probability_image)
@@ -161,7 +161,8 @@ def main():
             current_particle.position = (new_position[0], new_position[1])
 
         # Draw the background image
-        screen.blit(background_image, (0, 0))
+        #screen.blit(probability_image, (0, 0))
+        screen.fill(background_color)
 
         for particle in particles:
             pygame.draw.circle(screen, attached_color, (int(particle.position[0]), int(particle.position[1])),
@@ -176,7 +177,9 @@ def main():
          #   pygame.draw.lines(screen, (255, 255, 255), False, positions)
 
         pygame.display.flip()
-        #pygame.time.delay(10)
+
+    # Save the final screen as a PNG image
+    pygame.image.save(screen, "simulation_result.png")
 
     waiting = True
     while waiting:

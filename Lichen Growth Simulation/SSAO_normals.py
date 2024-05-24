@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+from PIL import Image
 
 # Generate random samples on 2D circle
 def generate_samples(num_samples, max_radius):
@@ -53,11 +54,13 @@ def compute_ssao(normal_image, depth_image, num_samples, max_radius):
 
 
 # Input images (normals and depth)
-input_normal = 'wall_normal.png'
-normal_image = cv2.imread(f'./images/input_normal/{input_normal}')
+input_normal = 'teulada1_normal.png'
+normal_image = Image.open(f'./images/input_normal/{input_normal}')
+normal_image = normal_image.convert('RGB')
+normal_image = np.array(normal_image)
 img_width, img_height, _ = normal_image.shape
 
-input_depth = 'wall_depth.png'
+input_depth = 'teulada1_depth.png'
 depth_image = cv2.imread(f'./images/input_depth/{input_depth}', cv2.IMREAD_GRAYSCALE)
 
 # Resize depth image
@@ -71,7 +74,7 @@ max_radius = min(img_width, img_height) / 8  # Maximum radius, 1/8 of image size
 occlusion_map = compute_ssao(normal_image, depth_image, num_samples, max_radius)
 
 # Apply blur filter to smooth the occlusion map
-#occlusion_map_blur = cv2.blur(occlusion_map, (0, 0))  # Adjust the kernel size as needed
+occlusion_map_blur = cv2.blur(occlusion_map, (3, 3))  # Adjust the kernel size as needed
 
 # Show Results
 plt.imshow(occlusion_map, cmap='gray')
@@ -81,4 +84,4 @@ plt.show()
 # Save the output image
 output_path = './images/output_SSAO'
 output_file = f'{output_path}/Blurred_SSAO_{input_depth}'
-plt.imsave(output_file, occlusion_map, cmap='gray')
+plt.imsave(output_file, occlusion_map_blur, cmap='gray')

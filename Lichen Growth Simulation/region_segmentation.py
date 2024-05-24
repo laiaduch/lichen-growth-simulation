@@ -36,7 +36,7 @@ def region_growing(img, seed, threshold, edge_mask=None):
 
 if __name__ == "__main__":
 
-    input_file = 'pedra2_depth.png'
+    input_file = 'teulada1_depth.png'
 
     # Read input image
     input_image = cv2.imread(f'./images/input_depth/{input_file}', cv2.IMREAD_GRAYSCALE)
@@ -47,21 +47,14 @@ if __name__ == "__main__":
     sobel_mag = np.sqrt(sobel_x ** 2 + sobel_y ** 2)
 
     # Threshold Sobel magnitude to obtain edge mask
-    sobel_edge_mask = np.uint8(sobel_mag > 10)  # Adjust threshold as needed
+    sobel_edge_mask = np.uint8(sobel_mag > 9)  # Adjust threshold as needed
 
     # Define seed point (you may choose this interactively)
     seed_point = (500, 250)
 
     # Perform region growing
-    threshold_value = 100  # Adjust threshold as needed
+    threshold_value = 65  # Adjust threshold as needed
     segmented_region = region_growing(input_image, seed_point, threshold_value, sobel_edge_mask)
-
-    '''# Display results
-    cv2.imshow("Original Image", input_image)
-    cv2.imshow("Sobel Edge Mask", sobel_edge_mask * 255)
-    cv2.imshow("Segmented Region", segmented_region)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()'''
 
     # Show results
     plt.subplot(1, 3, 1)
