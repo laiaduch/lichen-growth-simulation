@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def region_growing(img, seed, threshold, edge_mask=None):
+def region_growing(img, seed, threshold, edge_mask):
     rows, cols = img.shape
     region = np.zeros_like(img, dtype=np.uint8)
     visited = np.zeros_like(img, dtype=np.uint8)
@@ -36,7 +36,7 @@ def region_growing(img, seed, threshold, edge_mask=None):
 
 if __name__ == "__main__":
 
-    input_file = 'teulada1_depth.png'
+    input_file = 'cortezaarbre_depth.png'
 
     # Read input image
     input_image = cv2.imread(f'./images/input_depth/{input_file}', cv2.IMREAD_GRAYSCALE)
@@ -47,13 +47,13 @@ if __name__ == "__main__":
     sobel_mag = np.sqrt(sobel_x ** 2 + sobel_y ** 2)
 
     # Threshold Sobel magnitude to obtain edge mask
-    sobel_edge_mask = np.uint8(sobel_mag > 9)  # Adjust threshold as needed
+    sobel_edge_mask = np.uint8(sobel_mag > 20)  # Adjust threshold as needed
 
     # Define seed point (you may choose this interactively)
     seed_point = (500, 250)
 
     # Perform region growing
-    threshold_value = 65  # Adjust threshold as needed
+    threshold_value = 100  # Adjust threshold as needed
     segmented_region = region_growing(input_image, seed_point, threshold_value, sobel_edge_mask)
 
     # Show results

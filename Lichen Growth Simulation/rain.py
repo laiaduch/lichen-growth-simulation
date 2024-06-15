@@ -3,7 +3,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 # Load the input image of normals (assume that the image has 3 channels)
-input_file = 'teulada1_normal.png'
+input_file = 'cortezaarbre_normal.png'
 normal_img = Image.open(f'./images/input_normal/{input_file}')
 normal_img = normal_img.convert('RGB')
 normal_img = np.array(normal_img)
